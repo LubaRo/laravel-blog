@@ -39,7 +39,7 @@ class Post
     {
         $files = File::files(resource_path("posts"));
 
-        return collect($files)
+        $getPosts = fn() => collect($files)
             ->map(fn($path) => YamlFrontMatter::parseFile($path))
             ->map(fn($document) => new self(
                 $document->title,
@@ -49,6 +49,9 @@ class Post
                 $document->slug
             ))
             ->sortByDesc('date');
+
+
+        return cache()->rememberForever('posts.all', $getPosts);
     }
 
     /**
