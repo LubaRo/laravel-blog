@@ -5,14 +5,49 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Support\Facades\File;
+use Spatie\YamlFrontMatter\YamlFrontMatter;
 
 class Post
 {
-    public static function  findAll()
-    {
-        $files = File::files(resource_path("posts/"));
+    public ?string $title;
+    public ?string $excerpt;
+    public ?string $date;
+    public ?string $body;
+    public string $slug;
 
-        return array_map(fn($file) => $file->getContents(), $files);
+    /**
+     * Post constructor.
+     * @param ?string $title
+     * @param ?string $excerpt
+     * @param ?string $date
+     * @param ?string $body
+     * @param string $slug
+     */
+    public function __construct(?string $title, ?string $excerpt, ?string $date, ?string $body, string $slug)
+    {
+        $this->title   = $title;
+        $this->excerpt = $excerpt;
+        $this->date    = $date;
+        $this->body    = $body;
+        $this->slug    = $slug;
+    }
+
+    /**
+     * @return \Illuminate\Support\Collection
+     */
+    public static function findAll()
+    {
+        $files = File::files(resource_path("posts"));
+
+        return collect($files)
+            ->map(fn($path) => YamlFrontMatter::parseFile($path))
+            ->map(fn($document) => new self(
+                $document->title,
+                $document->excerpt,
+                $document->date,
+                $document->body(),
+                $document->slug
+            ));
     }
 
     /**
@@ -22,12 +57,6 @@ class Post
      */
     public static function find(string $slug)
     {
-        $path = resource_path("posts/{$slug}.html");
-
-        if (!file_exists($path)) {
-            throw new ModelNotFoundException();
-        }
-
-        return cache()->remember("posts.{$slug}", 5, fn() => file_get_contents($path));
+        return static::findAll()->firstWhere('slug', $slug);
     }
 }
