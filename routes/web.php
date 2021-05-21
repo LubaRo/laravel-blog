@@ -23,7 +23,8 @@ Route::get('/posts/{post}', function ($slug) {
     if (!file_exists($path)) {
         abort(404);
     }
-    return view('post', [
-        'post' => file_get_contents($path)
-    ]);
+
+    $post = cache()->remember("posts.{$slug}", 5, fn() => file_get_contents($path));
+
+    return view('post', ['post' => $post]);
 })->where('post', '[A-z\-]+');
