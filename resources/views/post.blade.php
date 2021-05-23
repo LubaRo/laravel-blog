@@ -2,7 +2,10 @@
     <article>
         <h1>{{ $post->title }}</h1>
 
-        <x-category-link :category="$post->category"></x-category-link>
+        <div>
+            <span>By <a href="#">{{ $post->user->name }}</a></span>
+            <span>&nbsp;in <x-category-link :category="$post->category"></x-category-link></span>
+        </div>
 
         <p>{!! $post->body !!}</p>
     </article>
