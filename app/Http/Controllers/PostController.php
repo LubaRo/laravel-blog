@@ -10,9 +10,14 @@ class PostController extends Controller
 {
     public function index()
     {
+        /** @var array $filters */
+        $filters = request()->only('search', 'category');
+
         return view('posts', [
-            'posts' => Post::latest()->filter(request()->only('search'))->get(),
-            'categories' => Category::all()
+            'posts' => Post::latest()->filter($filters)->get(),
+            'categories' => Category::all(),
+            'currentCategory' => isset($filters['category']) ? Category::firstWhere('slug', $filters['category']) : null,
+            'hasFilters' => sizeof($filters) > 0
         ]);
     }
 
