@@ -13,14 +13,14 @@ class PostController extends Controller
         /** @var array $filters */
         $filters = request()->only('search', 'category');
 
-        return view('posts', [
+        return view('posts.index', [
             'posts' => Post::latest()->filter($filters)->get(),
         ]);
     }
 
     public function show(Post $post)
     {
-        return view('post', [
+        return view('posts.show', [
             'post' => $post
         ]);
     }
