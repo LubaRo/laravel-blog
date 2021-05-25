@@ -15,9 +15,6 @@ class PostController extends Controller
 
         return view('posts', [
             'posts' => Post::latest()->filter($filters)->get(),
-            'categories' => Category::all(),
-            'currentCategory' => isset($filters['category']) ? Category::firstWhere('slug', $filters['category']) : null,
-            'hasFilters' => sizeof($filters) > 0
         ]);
     }
 
